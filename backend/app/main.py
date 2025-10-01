@@ -3,6 +3,7 @@ from .insert_resume_data import insert_resume
 from fastapi import FastAPI, UploadFile, File
 import shutil
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 app = FastAPI()
 
@@ -34,5 +35,8 @@ async def upload_file(file: UploadFile = File(...)):
         print("Error parsing resume: ", e)
         return {"error": "Failed to process resume", "details": str(e)}
     
+    finally:
+        os.remove(file_path)
+
     return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume.id}
     
