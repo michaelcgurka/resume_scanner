@@ -34,6 +34,9 @@ function Upload() {
         <div>
             <input type="file" onChange={handleFileChange} />
             <button onClick={handleUpload}>Upload Resume (PDF)</button>
+            <br></br><br></br>
+            <textarea></textarea>
+            <button>Upload Job Description</button>
         </div>
     );
 }

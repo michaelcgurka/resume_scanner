@@ -16,3 +16,12 @@ class Resume(Base):
     skills = Column(Text, nullable=True)
     objective = Column(Text, nullable=True)
     certifications = Column(Text, nullable=True)
+
+class Job(Base):
+    __tablename__ = "job_info"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), nullable=False)
+    job_description = Column(Text, nullable=True)
+
+
