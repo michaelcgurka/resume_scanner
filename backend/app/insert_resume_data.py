@@ -1,5 +1,5 @@
-from models import Resume
-from database import SessionLocal
+from .models import Resume
+from .database import SessionLocal
 
 def insert_resume(resume_data: dict):
     db = SessionLocal()

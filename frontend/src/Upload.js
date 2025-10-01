@@ -11,18 +11,23 @@ function Upload() {
             alert("Please select a file.");
             return;
         }
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const response = await fetch("http://localhost:8000/upload", {
+                method: "POST",
+                body: formData,
+            });
 
-        const formData = new FormData();
-        formData.append("file", file);
+            const result = await response.json();
 
-        const response = await fetch("http://localhost:8000/upload", {
-            method: "POST",
-            body: formData,
-        });
-
-        const result = await response.json();
-        console.log(result);
-        alert(`Uploaded: ${result.filename}`);
+            console.log(result);
+            alert(`Uploaded: ${result.filename}`);
+            
+        } catch (error) {
+            console.log("Unable to upload file. See error message.")
+            console.error(error.message);
+        }
     };
 
     return (
