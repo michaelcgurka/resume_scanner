@@ -25,11 +25,14 @@ async def upload_file(file: UploadFile = File(...)):
     try:
         parsed_resume = parse_resume_pdf(file_path)
 
-        if not parsed_resume:
-            return {"error": "Unable to parse resume."}
-    
-        resume = insert_resume(parsed_resume)
-
+        if parsed_resume:
+            resume = insert_resume(parsed_resume)
+        else:
+            return {
+                "filename": file.filename,
+                "status": "failed",
+                "error": "Unable to parse resume."
+            }
 
     except Exception as e:
         print("Error parsing resume: ", e)

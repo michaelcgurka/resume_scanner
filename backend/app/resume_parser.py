@@ -37,12 +37,18 @@ def parse_resume_pdf(file_path: str) -> dict:
 
     resume_dict = {}
     resume_dict['name'] = name
-    resume_dict['education'] = sections['education']
-    resume_dict['experience'] = sections['experience']
-    resume_dict['projects'] = sections['projects']
-    resume_dict['skills'] = sections['skills']
-    resume_dict['objective'] = sections['objective']
-    resume_dict['certifications'] = None
+    if sections['name']:
+        resume_dict['education'] = sections['education']
+    if sections['experience']:
+        resume_dict['experience'] = sections['experience']
+    if sections['projects']:
+        resume_dict['projects'] = sections['projects']
+    if sections['skills']:
+        resume_dict['skills'] = sections['skills']
+    if sections['objective']:
+        resume_dict['objective'] = sections['objective']
+    if sections['certifications']:
+        resume_dict['certifications'] = sections['certifications']
 
     print(resume_dict)
     

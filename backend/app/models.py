@@ -9,10 +9,10 @@ class Resume(Base):
     __tablename__ = "resume_info"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), nullable=False)
-    education = Column(Text, nullable=False)
-    experience = Column(Text, nullable=False)
-    projects = Column(Text, nullable=False)
+    name = Column(String(50), nullable=True)
+    education = Column(Text, nullable=True)
+    experience = Column(Text, nullable=True)
+    projects = Column(Text, nullable=True)
     skills = Column(Text, nullable=True)
     objective = Column(Text, nullable=True)
     certifications = Column(Text, nullable=True)
@@ -21,7 +21,7 @@ class Job(Base):
     __tablename__ = "job_info"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=True)
     job_description = Column(Text, nullable=True)
 
 
