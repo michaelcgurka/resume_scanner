@@ -6,20 +6,35 @@ function Upload() {
         setFile(e.target.files[0]);
     };
 
+    const [description, setDescription] = useState(null);
+    const handleDescriptionChange = (e) => {
+        setDescription(e.target.value);
+    };
+
     const handleUpload = async () => {
         if (!file) {
             alert("Please select a file.");
             return;
         }
+        if (!description) {
+            alert("Please add a job description.");
+            return;
+        }
         try {
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("description", description);
             const response = await fetch("http://localhost:8000/upload", {
                 method: "POST",
                 body: formData,
             });
 
             const result = await response.json();
+            console.log("Server response: ", result);
+
+            if (result.error) {
+                alert(`Error: ${result.error}\nDetails: ${result.details || ""}`)
+            }
 
             console.log(result);
             alert(`Uploaded: ${result.filename}`);
@@ -33,10 +48,9 @@ function Upload() {
     return (
         <div>
             <input type="file" onChange={handleFileChange} />
-            <button onClick={handleUpload}>Upload Resume (PDF)</button>
-            <br></br><br></br>
-            <textarea></textarea>
-            <button>Upload Job Description</button>
+            <br></br><p>Insert Job Description Below</p><br></br>
+            <textarea id='description' value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here"></textarea>
+            <button onClick={handleUpload}>Upload Resume and Job Description</button>
         </div>
     );
 }
