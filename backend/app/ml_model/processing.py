@@ -22,7 +22,16 @@ class PreprocessResume:
         for section in resume:
             if not section:
                 continue
-            cleaned_section = re.sub(r"\n", "", str(section))
+            cleaned_section = re.sub(r"-\n", "", str(section))
+            cleaned_section = re.sub(r"\n", " ", cleaned_section)
+            cleaned_section = re.sub(r"\|", ",", cleaned_section)
+            cleaned_section = re.sub(r"•", "", cleaned_section)
+            cleaned_section = cleaned_section.replace("–", "-").replace("—", "-")
+            cleaned_section = cleaned_section.replace("“", '"').replace("”", '"').replace("’", "'")
+            # Remove URLS like LinkedIn or GitHub
+            cleaned_section = re.sub(r"https?://\S+|www\.\S+", "", cleaned_section)
+            cleaned_section = cleaned_section.replace(".", "").replace(",", "")
+            cleaned_section = re.sub(r"\s+", " ", cleaned_section).strip()
             new_resume.append(cleaned_section)
 
         return new_resume
@@ -31,4 +40,4 @@ if __name__ == '__main__':
     process = PreprocessResume('michael gurka')
     resume = process.pull_resume()
     new_resume = process.clean_characters(resume)
-    print(new_resume[-1])
+    print(new_resume[2])
