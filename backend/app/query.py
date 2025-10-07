@@ -16,7 +16,6 @@ def query_resume(name):
 
     cur = conn.cursor()
     query = f"SELECT * FROM resume_info where name = '{name}';"
-    print(query)
     cur.execute(query)
     resume = cur.fetchall()
     
