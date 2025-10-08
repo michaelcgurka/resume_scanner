@@ -1,11 +1,7 @@
-import os
-import sys
 import re
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from query import query_resume
-
+from app.query import query_resume
+from app.query import query_job_description
 
 
 class PreprocessResume:
@@ -17,7 +13,11 @@ class PreprocessResume:
         resume = query_resume(self.name)
         return resume
     
-    def clean_characters(self, resume):
+    def pull_job_description(self):
+        job_description = query_job_description(self.name)
+        return job_description
+    
+    def clean_resume_characters(self, resume):
         new_resume = []
         for section in resume:
             if not section:
@@ -36,8 +36,10 @@ class PreprocessResume:
 
         return new_resume
     
-if __name__ == '__main__':
-    process = PreprocessResume('michael gurka')
-    resume = process.pull_resume()
-    new_resume = process.clean_characters(resume)
-    print(new_resume[2])
+    def clean_job_description(self, job_description):
+        new_job_description = []
+        if not job_description:
+            return
+        cleaned = re.sub("", "", str(job_description))
+        return new_job_description
+    
