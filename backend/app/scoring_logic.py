@@ -6,9 +6,9 @@ embedding = model.encode("I am a Python engineer skilled in machine learning")
 print(embedding.shape)
 
 """
-Extensive list of all tech keywords related to technical roles. Potential for redundancy
+Extensive list of all tech keywords related to technical roles.
 """
-TECH_KEYWORDS = []
+TECH_KEYWORDS = tech_keywords
 
 """
 Contains the bulk of the resume scoring logic. This is where matching,
@@ -21,5 +21,6 @@ def score_resume(job_description, resume):
 
     cosine_similarity = util.cos_sim(jd_embedding, resume_embedding)
 
+    
 
     return
