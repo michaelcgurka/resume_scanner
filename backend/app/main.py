@@ -1,9 +1,11 @@
 from .resume_parser import parse_resume_pdf
 from .insert_resume_data import insert_resume
-from fastapi import FastAPI, UploadFile, File
+from scoring_logic import score_resume
+from fastapi import FastAPI, UploadFile, File, HTTPException
 import shutil
 from fastapi.middleware.cors import CORSMiddleware
 import os
+from query import query_resume, query_job_description
 
 app = FastAPI()
 
@@ -43,3 +45,19 @@ async def upload_file(file: UploadFile = File(...)):
 
     return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume.id}
     
+
+@app.post("/score_resume/{name}")
+async def score_resume_endpoint(name: str):
+    try:
+        resume = query_resume(name)
+        job_description = query_job_description(name)
+
+        score = score_resume(job_description, resume)
+        return {
+            "name": name,
+            "score": score
+        }
+    except IndexError:
+        raise HTTPException(status_code=404, detail="JD/Resume not found.")
+    except Exception as e:
+        HTTPException(status_code=500, detail=str(e))
