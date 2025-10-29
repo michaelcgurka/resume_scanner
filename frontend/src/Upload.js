@@ -6,7 +6,7 @@ function Upload() {
         setFile(e.target.files[0]);
     };
 
-    const [description, setDescription] = useState(null);
+    const [description, setDescription] = useState("");
     const handleDescriptionChange = (e) => {
         setDescription(e.target.value);
     };
@@ -28,6 +28,7 @@ function Upload() {
                 method: "POST",
                 body: formData,
             });
+            alert("HERE")
 
             const result = await response.json();
             console.log("Server response: ", result);

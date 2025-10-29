@@ -15,7 +15,7 @@
   "scripts": {
     "start": "npx concurrently -s bash \"npm run start-frontend\" \"npm run start-backend\"",
     "start-frontend": "npx react-scripts start",
-    "start-backend": "../venv/bin/python -m uvicorn backend/app/main:app --reload",
+    "start-backend": "../venv/bin/python -m uvicorn ../backend/app/main:app --reload",
     "build": "npx react-scripts build",
     "test": "npx react-scripts test",
     "eject": "npx react-scripts eject"

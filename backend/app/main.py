@@ -1,13 +1,14 @@
 from .resume_parser import parse_resume_pdf
 from .insert_resume_data import insert_resume
-from scoring_logic import score_resume
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from .scoring_logic import score_resume
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 import shutil
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from query import query_resume, query_job_description
+from .query import query_resume, query_job_description
 
 app = FastAPI()
+
 
 
 app.add_middleware(
@@ -17,11 +18,13 @@ app.add_middleware(
     allow_headers = ["*"],
 )
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), description: str = Form(...)):
+    print(f"received file successfully")
+    contents = await file.read()
+    
     file_path = f"uploaded_{file.filename}"
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
+        buffer.write(contents)
 
 
     try:
