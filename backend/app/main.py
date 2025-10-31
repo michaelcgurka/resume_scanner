@@ -19,7 +19,7 @@ app.add_middleware(
 )
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...), description: str = Form(...)):
-    print(f"received file successfully")
+
     contents = await file.read()
     
     file_path = f"uploaded_{file.filename}"
