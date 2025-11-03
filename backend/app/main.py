@@ -2,7 +2,6 @@ from .resume_parser import parse_resume_pdf
 from .insert_resume_data import insert_resume
 from .scoring_logic import score_resume
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
-import shutil
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from .query import query_resume, query_job_description
@@ -63,4 +62,4 @@ async def score_resume_endpoint(name: str):
     except IndexError:
         raise HTTPException(status_code=404, detail="JD/Resume not found.")
     except Exception as e:
-        HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
