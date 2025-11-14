@@ -9,7 +9,6 @@ from .query import query_resume, query_job_description
 app = FastAPI()
 
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins = ["http://localhost:3000"],
@@ -31,6 +30,7 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
 
         if parsed_resume:
             resume = insert_resume(parsed_resume)
+            print("Successfully inserted resume.")
         else:
             return {
                 "filename": file.filename,
@@ -63,3 +63,4 @@ async def score_resume_endpoint(name: str):
         raise HTTPException(status_code=404, detail="JD/Resume not found.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
