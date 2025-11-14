@@ -1,10 +1,6 @@
-from .resume_parser import parse_resume_pdf
-from .insert_resume_data import insert_resume
-from .scoring_logic import score_resume
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from .query import query_resume, query_job_description
 
 app = FastAPI()
 
@@ -17,6 +13,8 @@ app.add_middleware(
 )
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...), description: str = Form(...)):
+    from .resume_parser import parse_resume_pdf
+    from .insert_resume_data import insert_resume
 
     contents = await file.read()
     
@@ -50,6 +48,9 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
 
 @app.post("/score_resume/{name}")
 async def score_resume_endpoint(name: str):
+    from .scoring_logic import score_resume
+    from .query import query_resume, query_job_description
+
     try:
         resume = query_resume(name)
         job_description = query_job_description(name)
