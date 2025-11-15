@@ -28,7 +28,6 @@ function Upload() {
                 method: "POST",
                 body: formData,
             });
-            alert("HERE")
 
             const result = await response.json();
             console.log("Server response: ", result);

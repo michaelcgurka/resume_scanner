@@ -27,30 +27,28 @@ def parse_resume_pdf(file_path: str) -> dict:
 
 
 
-
-
     def extract_name(text):
         name = text.splitlines()[0]
         return name
         
     name = extract_name(reader)
+    sections['name'] = name
+
+    keys = list(sections.keys())
 
     resume_dict = {}
     resume_dict['name'] = name
     if sections['name']:
         resume_dict['education'] = sections['education']
-    if sections['experience']:
+    if 'experience' in keys:
         resume_dict['experience'] = sections['experience']
-    if sections['projects']:
+    if 'projects' in keys:
         resume_dict['projects'] = sections['projects']
-    if sections['skills']:
+    if 'skills' in keys:
         resume_dict['skills'] = sections['skills']
-    if sections['objective']:
+    if 'objective' in keys:
         resume_dict['objective'] = sections['objective']
-    if sections['certifications']:
+    if 'certifications' in keys:
         resume_dict['certifications'] = sections['certifications']
-
-    print(resume_dict)
     
     return resume_dict
-

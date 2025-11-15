@@ -15,7 +15,6 @@ app.add_middleware(
 async def upload_file(file: UploadFile = File(...), description: str = Form(...)):
     from .resume_parser import parse_resume_pdf
     from .insert_resume_data import insert_resume
-
     contents = await file.read()
     
     file_path = f"uploaded_{file.filename}"
@@ -24,10 +23,10 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
 
 
     try:
+        print("attempting to parse resume")
         parsed_resume = parse_resume_pdf(file_path)
-
         if parsed_resume:
-            resume = insert_resume(parsed_resume)
+            resume = insert_resume(parsed_resume, description)
             print("Successfully inserted resume.")
         else:
             return {
@@ -43,7 +42,7 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
     finally:
         os.remove(file_path)
 
-    return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume.id}
+    return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume['resume_id']}
     
 
 @app.post("/score_resume/{name}")
