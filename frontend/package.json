@@ -13,9 +13,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "npx concurrently -s bash \"npm run start-frontend\" \"npm run start-backend\"",
-    "start-frontend": "npx react-scripts start",
-    "start-backend": "../venv/bin/python -m uvicorn ../backend/app/main:app --reload",
+    "start-frontend": "cross-env HOST=0.0.0.0 PORT=3000 react-scripts start",
+    "start-backend": "cd .. && ./venv/bin/python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
+    "start": "npx concurrently -k -n FRONTEND,BACKEND -c blue,green \"npm run start-frontend\" \"npm run start-backend\"",
     "build": "npx react-scripts build",
     "test": "npx react-scripts test",
     "eject": "npx react-scripts eject"
@@ -39,6 +39,7 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0"
   }
 }
