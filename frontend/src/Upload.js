@@ -29,11 +29,26 @@ function Upload() {
                 body: formData,
             });
 
+            // Check if response is ok before parsing JSON
+            if (!response.ok) {
+                let errorMsg = `Server error: ${response.status} ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.detail || errorData.error || errorMsg;
+                    const details = errorData.details || "";
+                    alert(`Error: ${errorMsg}${details ? `\nDetails: ${details}` : ""}`);
+                } catch (e) {
+                    // If response is not JSON, use status text
+                    alert(`Error: ${errorMsg}`);
+                }
+                return;
+            }
+
             const result = await response.json();
             console.log("Server response: ", result);
 
-            // Check if response was successful
-            if (!response.ok || result.error) {
+            // Check if response contains an error field
+            if (result.error) {
                 const errorMsg = result.error || `Server error: ${response.status}`;
                 const details = result.details || "";
                 alert(`Error: ${errorMsg}${details ? `\nDetails: ${details}` : ""}`);

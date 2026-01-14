@@ -1,18 +1,125 @@
 INFO:     Will watch for changes in these directories: ['/home/micha/projects/resume_scanner/backend']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [3098] using StatReload
-INFO:     Started server process [3121]
+INFO:     Started reloader process [10453] using StatReload
+INFO:     Started server process [10466]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10466]
+INFO:     Started server process [10680]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10680]
+INFO:     Started server process [10760]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+/home/micha/projects/resume_scanner/venv/lib/python3.12/site-packages/torch/cuda/__init__.py:182: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 11060). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at /pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
 {'name': 'michael gurka ', 'education': 'university of wisconsin–madison \n\nmadison, wi \n\ngpa: 3.65, dean’s honors list \nmay 2026 \nbachelor of science – computer science (honors in major) \nbachelor of science – industrial and systems engineering (operations research)  may 2026 \ncertificate – mathematics \nmay 2026 \ncoursework: data structures and algorithms, machine organization, combinatorial \noptimization, linear algebra, linear optimization, data management', 'experience': 'netskope, inc. \nplatform engineering intern \n\nsanta clara, ca | remote \njune 2025 – november 2025 \n\n•  employed machine learning principles in python to train a model to accurately correlate alert \n\nmessages based on text embeddings, using nlp models. \n\n•  used virtualized docker applications and contributed to an internal-facing alert monitoring \nsystem to optimize incident correlation, leading to operational insights regarding rca. \n•  analyzed historical alert data to extract patterns and guide modeling opportunities while \n\ncollaborating cross-functionally to identify integration points. \n\ncolony brands inc. \ndata analyst intern (supply chain development) \n\nmonroe, wi \nmay 2024 – august 2024 \n\n•  optimized data extraction processes by writing new queries to obtain data from the extensive \n\ncompany databases. \n\n•  supported data-driven decision making by providing leaders with clear visualizations of supply \n\nchain and financial data. \n\n•  communicated technical data extraction processes and statistic-heavy insights to non-technical \n\naudiences in the organization to expedite decision making.', 'projects': 'resume ats system (nlp/full-stack) \n\n•  developed a machine learned-oriented engine to rank resume scores using nlp and \n\ntransformers to categorize key technical terms. \n\n•  built the backend of the ats system in python to develop restful apis, handling pdf resume \n\nparsing and storing structured candidate data in a postgresql database. \n\n•  extracted resume information from pdfs using pypdf2 and preprocessed raw data fields to \n\nrun through the model pipeline. \n\n•  created an interactive dashboard using javascript and react.js to display resume scores and \n\npotential suggestions for users. \n\ncampus map server (object-oriented programming) \n\n•  developed backend code in java and html to parse datasets and create a location map of the \nuw-madison campus to find shortest paths between locations on a dynamic web server. \nimplemented an algorithmic solution to find optimal paths between locations and other user-\nprompted input on a dynamic web server designed with html and css. \n\n• \n\ncoffee shop simulation (probabilistic modeling) \n\n•  observed customer and employee behavior at a madison coffee shop to build an arena \nsimulation model and conducted statistical and sensitivity analysis to improve the model. \n•  used model to pinpoint bottlenecks and areas of improvement for store logistics, lessening the \n\nthroughput time of customers.', 'skills': 'languages: python, java, javascript, html, sql, julia, r, c, bash, css \ntechnologies: git, react.js, pytorch, pandas, scikit-learn, postgresql, docker, power bi, tableau'}
 Successfully inserted resume.
 Successfully inserted job description.
-INFO:     127.0.0.1:57116 - "POST /upload HTTP/1.1" 200 OK
+Error parsing resume:  'Resume' object is not subscriptable
+INFO:     127.0.0.1:52516 - "POST /upload HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10760]
+INFO:     Started server process [10842]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
 WARNING:  StatReload detected changes in 'backend/app/main.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [3121]
-INFO:     Started server process [4274]
+INFO:     Finished server process [10842]
+INFO:     Started server process [10844]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10844]
+INFO:     Started server process [10846]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10846]
+INFO:     Started server process [10847]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10847]
+INFO:     Started server process [12985]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12985]
+INFO:     Started server process [12995]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12995]
+INFO:     Started server process [13023]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13023]
+INFO:     Started server process [13090]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13090]
+INFO:     Started server process [13129]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13129]
+INFO:     Started server process [13137]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13137]
+INFO:     Started server process [13153]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13153]
+INFO:     Started server process [13162]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
