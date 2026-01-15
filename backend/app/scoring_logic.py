@@ -18,7 +18,7 @@ Build automation for keywords that will later be searched through.
 A = ahocorasick.Automaton()
 for idx, key in enumerate(tech_keywords):
     A.add_word(key, (idx, key))
-A.make_automation()
+A.make_automaton()
 
 
 """

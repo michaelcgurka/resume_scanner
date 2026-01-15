@@ -30,12 +30,12 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
         parsed_resume = parse_resume_pdf(file_path)
 
         if parsed_resume:
-            resume = insert_resume(parsed_resume)
+            resume_obj = insert_resume(parsed_resume)
             print("Successfully inserted resume.")
             job_description = insert_job_description(parsed_resume["name"], description)
             print("Successfully inserted job description.")
             name = parsed_resume["name"]
-            resume = resume_to_string(resume)
+            resume = resume_to_string(resume_obj)
             score = score_resume(description, resume)
             print("Successfully scored resume.")
 
@@ -53,7 +53,7 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
     finally:
         os.remove(file_path)
 
-    return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume.id, "score": score}
+    return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume_obj.id, "score": score}
     
 
 @app.post("/score_resume/{name}")
@@ -63,10 +63,8 @@ async def score_resume_endpoint(name: str):
 
     try:
         resume = query_resume(name)
-        job_description_tuple = query_job_description(name)
-        # Extract job description string from tuple (id, name, job_description)
-        job_description = job_description_tuple[2] if isinstance(job_description_tuple, tuple) and len(job_description_tuple) > 2 else job_description_tuple
-
+        job_description = query_job_description(name)[2] # last item in tuple
+        resume = " ".join(resume)
         score = score_resume(job_description, resume)
         return {
             "name": name,
