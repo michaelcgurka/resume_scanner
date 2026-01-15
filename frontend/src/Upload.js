@@ -77,7 +77,7 @@ function Upload() {
         <div>
             <input type="file" onChange={handleFileChange} disabled={loading} />
             <br></br><p>Insert Job Description Below</p><br></br>
-            <textarea id='description' value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here" disabled={loading}></textarea>
+            <textarea style= {{textAlign: "center"}} id='description' value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here" disabled={loading}></textarea>
             <button onClick={handleUpload} disabled={loading}> {loading ? "Uploading..." : "Upload Resume and Job Description"}</button>
             {loading && ( 
                 <div style={{marginTop: "20px", display: "flex", justifyContent: "center"}}>
