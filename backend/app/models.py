@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, Float
 
 
 Base = declarative_base()
@@ -16,6 +16,7 @@ class Resume(Base):
     skills = Column(Text, nullable=True)
     objective = Column(Text, nullable=True)
     certifications = Column(Text, nullable=True)
+    score = Column(Float, nullable=True)
 
 class Job(Base):
     __tablename__ = "job_info"

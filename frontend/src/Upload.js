@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import Loader from "./Loader";
 
 function Upload() {
     const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
@@ -20,6 +22,9 @@ function Upload() {
             alert("Please add a job description.");
             return;
         }
+
+        setLoading(true);
+
         try {
             const formData = new FormData();
             formData.append("file", file);
@@ -63,14 +68,22 @@ function Upload() {
             console.error("Unable to upload file:", error);
             alert(`Error: Unable to upload file. ${error.message}`);
         }
+        finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div>
-            <input type="file" onChange={handleFileChange} />
+            <input type="file" onChange={handleFileChange} disabled={loading} />
             <br></br><p>Insert Job Description Below</p><br></br>
-            <textarea id='description' value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here"></textarea>
-            <button onClick={handleUpload}>Upload Resume and Job Description</button>
+            <textarea id='description' value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here" disabled={loading}></textarea>
+            <button onClick={handleUpload} disabled={loading}> {loading ? "Uploading..." : "Upload Resume and Job Description"}</button>
+            {loading && ( 
+                <div style={{marginTop: "20px", display: "flex", justifyContent: "center"}}>
+                    <Loader />
+                </div>
+            )}
         </div>
     );
 }

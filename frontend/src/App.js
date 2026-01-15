@@ -1,5 +1,6 @@
 import React from "react";
 import Upload from "./Upload";  // import Upload component
+import Loader from "./Loader";  // import Loader component
 
 function App() {
   return (

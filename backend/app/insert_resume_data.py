@@ -19,4 +19,18 @@ def insert_job_description(name: str, job_description: str):
     db.close()
     return new_job
 
-
+def update_score(resume_id: int, score: float):
+    db = SessionLocal()
+    try:
+        resume = db.query(Resume).filter(Resume.id == resume_id).first()
+        if resume:
+            resume.score = score
+            db.commit()
+            db.refresh(resume)
+            db.close()
+            return resume
+    except Exception as e:
+        print(f"Error inserting score: {e}")
+        return None
+    finally:
+        db.close()

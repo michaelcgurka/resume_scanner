@@ -16,7 +16,7 @@ app.add_middleware(
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...), description: str = Form(...)):
     from .resume_parser import parse_resume_pdf
-    from .insert_resume_data import insert_resume, insert_job_description
+    from .insert_resume_data import insert_resume, insert_job_description, update_score
     from .scoring_logic import score_resume, resume_to_string
 
     contents = await file.read()
@@ -37,6 +37,7 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
             name = parsed_resume["name"]
             resume = resume_to_string(resume_obj)
             score = score_resume(description, resume)
+            update_score(resume_obj.id, score)
             print("Successfully scored resume.")
 
         else:
