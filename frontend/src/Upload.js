@@ -4,6 +4,8 @@ import Loader from "./Loader";
 function Upload() {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [lastResult, setLastResult] = useState(null);
+    const [viewingScore, setViewingScore] = useState(false);
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
@@ -24,6 +26,7 @@ function Upload() {
         }
 
         setLoading(true);
+        setLastResult(null);
 
         try {
             const formData = new FormData();
@@ -39,48 +42,49 @@ function Upload() {
                 let errorMsg = `Server error: ${response.status} ${response.statusText}`;
                 try {
                     const errorData = await response.json();
-                    errorMsg = errorData.detail || errorData.error || errorMsg;
-                    const details = errorData.details || "";
-                    alert(`Error: ${errorMsg}${details ? `\nDetails: ${details}` : ""}`);
+                    const detail = errorData.detail ?? errorData.error;
+                    errorMsg = typeof detail === "string" ? detail : Array.isArray(detail) ? detail.map((x) => x?.msg ?? x).join("; ") : errorMsg;
+                    alert(`Error: ${errorMsg}`);
                 } catch (e) {
-                    // If response is not JSON, use status text
                     alert(`Error: ${errorMsg}`);
                 }
                 return;
             }
 
             const result = await response.json();
-            console.log("Server response: ", result);
-
-            // Check if response contains an error field
-            if (result.error) {
-                const errorMsg = result.error || `Server error: ${response.status}`;
-                const details = result.details || "";
-                alert(`Error: ${errorMsg}${details ? `\nDetails: ${details}` : ""}`);
-                return;
-            }
-
-            // Success case
-            console.log(result);
+            setLastResult(result);
             alert(`Successfully uploaded: ${result.filename}\nName: ${result.name}`);
-            
         } catch (error) {
             console.error("Unable to upload file:", error);
             alert(`Error: Unable to upload file. ${error.message}`);
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
     };
 
+    if (viewingScore && lastResult) {
+        return (
+            <div>
+                <p><strong>Name:</strong> {lastResult.name}</p>
+                <p><strong>Score:</strong> {lastResult.score != null ? Number(lastResult.score).toFixed(4) : "—"}</p>
+                <button onClick={() => setViewingScore(false)}>Back</button>
+            </div>
+        );
+    }
+
     return (
         <div>
-            <input type="file" onChange={handleFileChange} disabled={loading} />
-            <br></br><p>Insert Job Description Below</p><br></br>
-            <textarea style= {{textAlign: "center"}} id='description' value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here" disabled={loading}></textarea>
-            <button onClick={handleUpload} disabled={loading}> {loading ? "Uploading..." : "Upload Resume and Job Description"}</button>
-            {loading && ( 
-                <div style={{marginTop: "20px", display: "flex", justifyContent: "center"}}>
+            <input type="file" accept=".pdf,application/pdf" onChange={handleFileChange} disabled={loading} />
+            <br /><p>Insert Job Description Below</p><br />
+            <textarea style={{ textAlign: "center" }} id="description" value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here" disabled={loading} />
+            <button onClick={handleUpload} disabled={loading}>{loading ? "Uploading..." : "Upload Resume and Job Description"}</button>
+            {lastResult && (
+                <div style={{ marginTop: "1rem" }}>
+                    <button onClick={() => setViewingScore(true)}>View Score</button>
+                </div>
+            )}
+            {loading && (
+                <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
                     <Loader />
                 </div>
             )}

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import tempfile
 
 app = FastAPI()
 
@@ -13,6 +14,13 @@ app.add_middleware(
     allow_headers = ["*"],
 )
 
+def _safe_remove(path: str) -> None:
+    try:
+        if path and os.path.exists(path):
+            os.remove(path)
+    except OSError as e:
+        print(f"Warning: could not remove temp file {path}: {e}")
+
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...), description: str = Form(...)):
     from .resume_parser import parse_resume_pdf
@@ -20,41 +28,41 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
     from .scoring_logic import score_resume, resume_to_string
 
     contents = await file.read()
-    
-    file_path = f"uploaded_{file.filename}"
-    with open(file_path, "wb") as buffer:
-        buffer.write(contents)
-
+    suffix = os.path.splitext(file.filename or "")[1] or ".pdf"
+    fd, file_path = tempfile.mkstemp(suffix=suffix, prefix="resume_upload_")
+    try:
+        with os.fdopen(fd, "wb") as buffer:
+            buffer.write(contents)
+    except Exception:
+        _safe_remove(file_path)
+        raise HTTPException(status_code=500, detail="Failed to save uploaded file.")
 
     try:
         parsed_resume = parse_resume_pdf(file_path)
+        if not parsed_resume:
+            raise HTTPException(status_code=422, detail="Unable to parse resume.")
 
-        if parsed_resume:
-            resume_obj = insert_resume(parsed_resume)
-            print("Successfully inserted resume.")
-            job_description = insert_job_description(parsed_resume["name"], description)
-            print("Successfully inserted job description.")
-            name = parsed_resume["name"]
-            resume = resume_to_string(resume_obj)
-            score = score_resume(description, resume)
-            update_score(resume_obj.id, score)
-            print("Successfully scored resume.")
+        resume_obj = insert_resume(parsed_resume)
+        insert_job_description(parsed_resume["name"], description)
+        resume_text = resume_to_string(resume_obj)
+        score = score_resume(description, resume_text)
+        update_score(resume_obj.id, score)
 
-        else:
-            return {
-                "filename": file.filename,
-                "status": "failed",
-                "error": "Unable to parse resume."
-            }
-
+        return {
+            "name": parsed_resume["name"],
+            "parsed": parsed_resume,
+            "filename": file.filename,
+            "status": "uploaded",
+            "db_id": resume_obj.id,
+            "score": score,
+        }
+    except HTTPException:
+        raise
     except Exception as e:
-        print("Error parsing resume: ", e)
-        return {"error": "Failed to process resume", "details": str(e)}
-    
+        print("Error processing resume:", e)
+        raise HTTPException(status_code=500, detail=f"Failed to process resume: {str(e)}") from e
     finally:
-        os.remove(file_path)
-
-    return {"name": parsed_resume['name'], "parsed": parsed_resume, "filename": file.filename, "status": "uploaded", "db_id": resume_obj.id, "score": score}
+        _safe_remove(file_path)
     
 
 @app.post("/score_resume/{name}")

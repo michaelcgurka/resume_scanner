@@ -23,14 +23,15 @@ def update_score(resume_id: int, score: float):
     db = SessionLocal()
     try:
         resume = db.query(Resume).filter(Resume.id == resume_id).first()
-        if resume:
-            resume.score = score
-            db.commit()
-            db.refresh(resume)
-            db.close()
-            return resume
+        if not resume:
+            raise ValueError(f"Resume id {resume_id} not found")
+        resume.score = score
+        db.commit()
+        db.refresh(resume)
+        return resume
     except Exception as e:
-        print(f"Error inserting score: {e}")
-        return None
+        db.rollback()
+        print(f"Error updating score: {e}")
+        raise
     finally:
         db.close()
