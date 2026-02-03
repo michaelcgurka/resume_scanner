@@ -15,8 +15,8 @@ def query_resume(name):
     )
 
     cur = conn.cursor()
-    query = f"SELECT * FROM resume_info where name = '{name}';"
-    cur.execute(query)
+    query = f"SELECT * FROM resume_info where name = %s;"
+    cur.execute(query, (name,))
     resume = cur.fetchall()
     
     # TODO: fix handling of multiple resumes
@@ -39,8 +39,8 @@ def query_job_description(name):
 
     cur = conn.cursor()
 
-    query = f"SELECT * FROM job_info WHERE name = '{name}';"
-    cur.execute(query)
+    query = f"SELECT * FROM job_info WHERE name = %s;"
+    cur.execute(query, (name,))
     job_description = cur.fetchall()
     if len(job_description) > 1:
         return job_description[-1] # TODO: fix handling of multiple matching job descriptions, for now return most recent entry
