@@ -68,19 +68,23 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
 @app.post("/score_resume/{name}")
 async def score_resume_endpoint(name: str):
     from .scoring_logic import score_resume
-    from .query import query_resume, query_job_description
+    from .query import query_resume, query_job_description, resume_row_to_text
 
     try:
-        resume = query_resume(name)
-        job_description = query_job_description(name)[2] # last item in tuple
-        resume = " ".join(resume)
-        score = score_resume(job_description, resume)
-        return {
-            "name": name,
-            "score": score
-        }
+        resume_row = query_resume(name)
+        job_row = query_job_description(name)
+        jd_text = job_row[2] if len(job_row) > 2 and job_row[2] else ""
+        resume_text = resume_row_to_text(resume_row)
+        if not resume_text.strip():
+            raise HTTPException(status_code=422, detail="Resume has no text content to score.")
+        if not jd_text or not str(jd_text).strip():
+            raise HTTPException(status_code=422, detail="Job description is empty.")
+        score = score_resume(str(jd_text), resume_text)
+        return {"name": name, "score": score}
     except IndexError:
         raise HTTPException(status_code=404, detail="JD/Resume not found.")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

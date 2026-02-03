@@ -1,7 +1,6 @@
 from sentence_transformers import SentenceTransformer, util
 from .keyword_list import tech_keywords
 import ahocorasick
-from sqlalchemy import inspect
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 

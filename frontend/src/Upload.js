@@ -6,14 +6,10 @@ function Upload() {
     const [loading, setLoading] = useState(false);
     const [lastResult, setLastResult] = useState(null);
     const [viewingScore, setViewingScore] = useState(false);
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-    };
-
     const [description, setDescription] = useState("");
-    const handleDescriptionChange = (e) => {
-        setDescription(e.target.value);
-    };
+
+    const handleFileChange = (e) => setFile(e.target.files[0]);
+    const handleDescriptionChange = (e) => setDescription(e.target.value);
 
     const handleUpload = async () => {
         if (!file) {
@@ -37,7 +33,6 @@ function Upload() {
                 body: formData,
             });
 
-            // Check if response is ok before parsing JSON
             if (!response.ok) {
                 let errorMsg = `Server error: ${response.status} ${response.statusText}`;
                 try {
@@ -64,27 +59,59 @@ function Upload() {
 
     if (viewingScore && lastResult) {
         return (
-            <div>
-                <p><strong>Name:</strong> {lastResult.name}</p>
-                <p><strong>Score:</strong> {lastResult.score != null ? Number(lastResult.score).toFixed(4) : "—"}</p>
-                <button onClick={() => setViewingScore(false)}>Back</button>
+            <div className="max-w-xl w-full mx-auto p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-center">
+                <p className="text-gray-900 dark:text-gray-100"><strong>Name:</strong> {lastResult.name}</p>
+                <p className="text-gray-900 dark:text-gray-100 mt-2"><strong>Score:</strong> {lastResult.score != null ? Number(lastResult.score).toFixed(4) : "—"}</p>
+                <button
+                    type="button"
+                    onClick={() => setViewingScore(false)}
+                    className="mt-4 text-sm text-gray-600 dark:text-gray-400 hover:underline"
+                >
+                    Back
+                </button>
             </div>
         );
     }
 
     return (
-        <div>
-            <input type="file" accept=".pdf,application/pdf" onChange={handleFileChange} disabled={loading} />
-            <br /><p>Insert Job Description Below</p><br />
-            <textarea style={{ textAlign: "center" }} id="description" value={description || ""} onChange={handleDescriptionChange} placeholder="Paste job description here" disabled={loading} />
-            <button onClick={handleUpload} disabled={loading}>{loading ? "Uploading..." : "Upload Resume and Job Description"}</button>
+        <div className="max-w-xl w-full mx-auto p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <input
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={handleFileChange}
+                disabled={loading}
+                className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 dark:file:bg-gray-700 dark:file:text-gray-200"
+            />
+            <p className="mt-4 text-sm font-medium text-gray-700 dark:text-gray-300">Insert Job Description Below</p>
+            <textarea
+                id="description"
+                value={description || ""}
+                onChange={handleDescriptionChange}
+                placeholder="Paste job description here"
+                disabled={loading}
+                className="w-full mt-2 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 min-h-[120px]"
+            />
+            <button
+                type="button"
+                onClick={handleUpload}
+                disabled={loading}
+                className="mt-4 px-4 py-2 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {loading ? "Uploading..." : "Upload Resume and Job Description"}
+            </button>
             {lastResult && (
-                <div style={{ marginTop: "1rem" }}>
-                    <button onClick={() => setViewingScore(true)}>View Score</button>
+                <div className="mt-4">
+                    <button
+                        type="button"
+                        onClick={() => setViewingScore(true)}
+                        className="text-sm text-gray-600 dark:text-gray-400 hover:underline"
+                    >
+                        View Score
+                    </button>
                 </div>
             )}
             {loading && (
-                <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+                <div className="mt-5 flex justify-center">
                     <Loader />
                 </div>
             )}
