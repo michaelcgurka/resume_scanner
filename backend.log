@@ -1,6 +1,22 @@
 INFO:     Will watch for changes in these directories: ['/mnt/c/Users/micha/resume_scanner/backend']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [2629] using StatReload
-INFO:     Started server process [2671]
+INFO:     Started reloader process [3652] using StatReload
+INFO:     Started server process [3676]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/app/scoring_logic.py'. Reloading...
+Error processing resume: (psycopg2.errors.UndefinedColumn) column "resume_id" of relation "job_info" does not exist
+LINE 1: INSERT INTO job_info (resume_id, name, job_description, scor...
+                              ^
+
+[SQL: INSERT INTO job_info (resume_id, name, job_description, score) VALUES (%(resume_id)s, %(name)s, %(job_description)s, %(score)s) RETURNING job_info.id]
+[parameters: {'resume_id': 6, 'name': 'michael gurka', 'job_description': 'We are seeking a motivated Entry-Level Software Engineer to join our growing engineering team. In this role, you will work closely with senior engine ... (1889 characters truncated) ... to Apply\r\n\r\nSubmit your resume and a brief cover letter describing your interest in software engineering and any relevant experience or projects.', 'score': None}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:50190 - "POST /upload HTTP/1.1" 500 Internal Server Error
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3676]
+INFO:     Started server process [4598]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.

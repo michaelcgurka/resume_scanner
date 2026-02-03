@@ -1,8 +1,22 @@
 from sentence_transformers import SentenceTransformer, util
 from .keyword_list import tech_keywords
 import ahocorasick
+import time
+import sys
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+# Lazy-load model so backend starts fast; first score request will load it once.
+_model = None
+
+def _get_model():
+    global _model
+    if _model is None:
+        t0 = time.perf_counter()
+        print("Loading ML model (first time may download ~90MB and take 1–5+ min)...", flush=True)
+        sys.stdout.flush()
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+        elapsed = time.perf_counter() - t0
+        print(f"Model loaded in {elapsed:.1f}s", flush=True)
+    return _model
 
 keyword_weight = 0.3
 
@@ -25,9 +39,12 @@ Contains the bulk of the resume scoring logic. This is where matching,
 tokenization, embedding, etc takes place.
 """
 def score_resume(job_description, resume):
-
+    model = _get_model()
+    t0 = time.perf_counter()
     jd_embedding = model.encode(job_description)
     resume_embedding = model.encode(resume)
+    elapsed = time.perf_counter() - t0
+    print(f"Encode + score done in {elapsed:.1f}s", flush=True)
 
     cosine_similarity = util.cos_sim(jd_embedding, resume_embedding).item()
 

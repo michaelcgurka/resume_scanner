@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Loader from "./Loader";
 
 function Upload() {
@@ -7,6 +7,31 @@ function Upload() {
     const [lastResult, setLastResult] = useState(null);
     const [viewingScore, setViewingScore] = useState(false);
     const [description, setDescription] = useState("");
+    const [warmupDone, setWarmupDone] = useState(false);
+    const [warmupLoading, setWarmupLoading] = useState(true);
+
+    // Preload the ML model when the page loads so the first upload is fast
+    useEffect(() => {
+        let cancelled = false;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000); // 10 min for first-time download
+        fetch("http://localhost:8000/warmup", { signal: controller.signal })
+            .then((r) => (cancelled ? null : r.json()))
+            .then((data) => {
+                if (!cancelled && data) {
+                    setWarmupDone(true);
+                }
+            })
+            .catch(() => { if (!cancelled) setWarmupDone(true); }) // consider ready even on timeout so upload can still be tried
+            .finally(() => {
+                clearTimeout(timeoutId);
+                if (!cancelled) setWarmupLoading(false);
+            });
+        return () => {
+            cancelled = true;
+            controller.abort();
+        };
+    }, []);
 
     const handleFileChange = (e) => setFile(e.target.files[0]);
     const handleDescriptionChange = (e) => setDescription(e.target.value);
@@ -28,10 +53,15 @@ function Upload() {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("description", description);
+            // First upload may load the ML model (download + load can take 5–15 min); use a long timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15 * 60 * 1000); // 15 min
             const response = await fetch("http://localhost:8000/upload", {
                 method: "POST",
                 body: formData,
+                signal: controller.signal,
             });
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 let errorMsg = `Server error: ${response.status} ${response.statusText}`;
@@ -51,7 +81,11 @@ function Upload() {
             alert(`Successfully uploaded: ${result.filename}\nName: ${result.name}`);
         } catch (error) {
             console.error("Unable to upload file:", error);
-            alert(`Error: Unable to upload file. ${error.message}`);
+            const isTimeout = error.name === "AbortError";
+            const msg = isTimeout
+                ? "Request took too long (over 15 minutes). The first upload downloads and loads the scoring model—this can take 5–15 min on slow connections or disk. Next time, wait until the page shows \"Scorer ready\" before uploading, or check backend.log for timing details."
+                : `Error: Unable to upload file. ${error.message}`;
+            alert(msg);
         } finally {
             setLoading(false);
         }
@@ -99,6 +133,9 @@ function Upload() {
             >
                 {loading ? "Uploading..." : "Upload Resume and Job Description"}
             </button>
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {warmupLoading ? "Preparing scorer (first time can take 1–5 min: downloading/loading model)…" : warmupDone ? "Scorer ready. Upload should be quick." : "First upload may take 1–5 min while the model loads."}
+            </p>
             {lastResult && (
                 <div className="mt-4">
                     <button

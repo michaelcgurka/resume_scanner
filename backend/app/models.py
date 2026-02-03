@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, Float
+from sqlalchemy import Column, Integer, String, Text, Float, ForeignKey
 
 
 Base = declarative_base()
@@ -18,11 +18,14 @@ class Resume(Base):
     certifications = Column(Text, nullable=True)
     score = Column(Float, nullable=True)
 
+
 class Job(Base):
     __tablename__ = "job_info"
 
     id = Column(Integer, primary_key=True, index=True)
+    resume_id = Column(Integer, ForeignKey("resume_info.id"), nullable=True)
     name = Column(String(50), nullable=True)
     job_description = Column(Text, nullable=True)
+    score = Column(Float, nullable=True)
 
 

@@ -30,7 +30,10 @@ def query_resume(name):
 
 
 def query_job_description(name):
-    """Return one job row (tuple): (id, name, job_description). Raises IndexError if not found."""
+    """
+    Return one job row (tuple) for the given name (most recent by id).
+    Schema: (id, resume_id, name, job_description, score). Raises IndexError if not found.
+    """
     conn = _get_conn()
     try:
         cur = conn.cursor()
@@ -39,6 +42,20 @@ def query_job_description(name):
         if not rows:
             raise IndexError("No job description found for name: {}".format(name))
         return max(rows, key=lambda r: r[0])
+    finally:
+        conn.close()
+
+
+def query_jobs_by_resume_id(resume_id: int):
+    """Return list of job rows (tuples) for this resume, ordered by id. Schema: (id, resume_id, name, job_description, score)."""
+    conn = _get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT * FROM job_info WHERE resume_id = %s ORDER BY id;",
+            (resume_id,),
+        )
+        return cur.fetchall()
     finally:
         conn.close()
 
