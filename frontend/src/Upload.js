@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Loader from "./Loader";
 
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
 function Upload() {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -56,7 +58,7 @@ function Upload() {
             // First upload may load the ML model (download + load can take 5–15 min); use a long timeout
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15 * 60 * 1000); // 15 min
-            const response = await fetch("http://localhost:8000/upload", {
+            const response = await fetch(`${API_BASE}/upload`, {
                 method: "POST",
                 body: formData,
                 signal: controller.signal,
@@ -82,9 +84,15 @@ function Upload() {
         } catch (error) {
             console.error("Unable to upload file:", error);
             const isTimeout = error.name === "AbortError";
-            const msg = isTimeout
-                ? "Request took too long (over 15 minutes). The first upload downloads and loads the scoring model—this can take 5–15 min on slow connections or disk. Next time, wait until the page shows \"Scorer ready\" before uploading, or check backend.log for timing details."
-                : `Error: Unable to upload file. ${error.message}`;
+            const isNetwork = !error.response && (error.message === "Failed to fetch" || error.name === "TypeError");
+            let msg;
+            if (isTimeout) {
+                msg = "Request took too long (over 15 minutes). The first upload downloads and loads the scoring model—this can take 5–15 min on slow connections or disk. Next time, wait until the page shows \"Scorer ready\" before uploading, or check backend.log for timing details.";
+            } else if (isNetwork) {
+                msg = "Could not reach the backend (Failed to fetch). Make sure the backend is running (npm start or ./start.sh) and that it is listening on the same host you use here. If you use 127.0.0.1 in the browser, try localhost instead, or set REACT_APP_API_URL in frontend/.env (e.g. REACT_APP_API_URL=http://127.0.0.1:8000).";
+            } else {
+                msg = `Error: Unable to upload file. ${error.message}`;
+            }
             alert(msg);
         } finally {
             setLoading(false);
@@ -95,7 +103,7 @@ function Upload() {
         return (
             <div className="max-w-xl w-full mx-auto p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-center">
                 <p className="text-gray-900 dark:text-gray-100"><strong>Name:</strong> {lastResult.name}</p>
-                <p className="text-gray-900 dark:text-gray-100 mt-2"><strong>Score:</strong> {lastResult.score != null ? Number(lastResult.score).toFixed(4) : "—"}</p>
+                <p className="text-gray-900 dark:text-gray-100 mt-2"><strong>Score:</strong> {lastResult.score != null ? `${(Number(lastResult.score) * 100).toFixed(1)}%` : "—"}</p>
                 <button
                     type="button"
                     onClick={() => setViewingScore(false)}

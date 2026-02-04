@@ -10,11 +10,20 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["http://localhost:3000"],
-    allow_credentials = True,
-    allow_methods = ["*"],
-    allow_headers = ["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+# Upload limits (tune for production)
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
+ALLOWED_EXTENSIONS = {".pdf"}
 
 def _safe_remove(path: str) -> None:
     try:
@@ -50,7 +59,17 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
 
     t_start = time.perf_counter()
     contents = await file.read()
-    suffix = os.path.splitext(file.filename or "")[1] or ".pdf"
+    if len(contents) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Maximum size is {MAX_UPLOAD_BYTES // (1024*1024)} MB.",
+        )
+    suffix = (os.path.splitext(file.filename or "")[1] or "").lower()
+    if suffix not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=422,
+            detail="Only PDF files are allowed.",
+        )
     fd, file_path = tempfile.mkstemp(suffix=suffix, prefix="resume_upload_")
     try:
         with os.fdopen(fd, "wb") as buffer:
@@ -71,10 +90,9 @@ async def upload_file(file: UploadFile = File(...), description: str = Form(...)
         resume_obj, _ = get_or_create_resume(parsed_resume)
         job_obj = insert_job(resume_obj.id, parsed_resume["name"], description)
         print(f"DB get/create + insert job: {time.perf_counter() - t0:.1f}s", flush=True)
-        resume_text = resume_to_string(resume_obj)
         t0 = time.perf_counter()
         loop = asyncio.get_event_loop()
-        score = await loop.run_in_executor(None, lambda: score_resume(description, resume_text))
+        score = await loop.run_in_executor(None, lambda: score_resume(description, resume_obj))
         print(f"Score (model load + encode): {time.perf_counter() - t0:.1f}s", flush=True)
         update_job_score(job_obj.id, score)
         update_score(resume_obj.id, score)
@@ -107,7 +125,7 @@ async def add_job_description(name: str, body: dict = Body(...)):
         update_job_score,
         update_score,
     )
-    from .scoring_logic import score_resume, resume_to_string
+    from .scoring_logic import score_resume
 
     description = body.get("description") or body.get("job_description") or ""
     if not str(description).strip():
@@ -118,10 +136,9 @@ async def add_job_description(name: str, body: dict = Body(...)):
         raise HTTPException(status_code=404, detail=f"No resume found for name: {name}")
 
     job_obj = insert_job(resume.id, name, str(description))
-    resume_text = resume_to_string(resume)
     loop = asyncio.get_event_loop()
     score = await loop.run_in_executor(
-        None, lambda: score_resume(str(description), resume_text)
+        None, lambda: score_resume(str(description), resume)
     )
     update_job_score(job_obj.id, score)
     update_score(resume.id, score)
@@ -165,7 +182,6 @@ async def score_resume_endpoint(name: str, job_id: int = None):
     otherwise use the most recent job for that name.
     """
     from .scoring_logic import score_resume
-    from .query import query_resume, resume_row_to_text
     from .insert_resume_data import get_resume_by_name, get_jobs_by_resume_id
 
     try:
@@ -189,18 +205,14 @@ async def score_resume_endpoint(name: str, job_id: int = None):
         if not jd_text.strip():
             raise HTTPException(status_code=422, detail="Job description is empty.")
 
-        resume_row = query_resume(name)
-        resume_text = resume_row_to_text(resume_row)
-        if not resume_text.strip():
-            raise HTTPException(status_code=422, detail="Resume has no text content to score.")
-
         loop = asyncio.get_event_loop()
         score = await loop.run_in_executor(
-            None, lambda: score_resume(str(jd_text), resume_text)
+            None, lambda: score_resume(str(jd_text), resume)
         )
         return {"name": name, "job_id": job.id, "score": score}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("Error in score_resume endpoint:", e, flush=True)
+        raise HTTPException(status_code=500, detail="Scoring failed. Please try again.")
 

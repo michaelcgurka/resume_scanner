@@ -1,7 +1,16 @@
 .env
-Michael Gurka CS Resume.pdf
-SWE_Resume.pdf
+.env.local
+.env.*.local
+*.log
+backend.log
 venv
 __pycache__
-start.sh
+*.pyc
 node_modules
+SECURITY.md
+# Optional: uncomment if you use a local start script override
+# start.sh
+
+# Personal resume PDFs (do not commit)
+Michael Gurka CS Resume.pdf
+SWE_Resume.pdf
