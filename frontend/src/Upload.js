@@ -17,7 +17,7 @@ function Upload() {
         let cancelled = false;
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000); // 10 min for first-time download
-        fetch("http://localhost:8000/warmup", { signal: controller.signal })
+        fetch(`${API_BASE}/warmup`, { signal: controller.signal })
             .then((r) => (cancelled ? null : r.json()))
             .then((data) => {
                 if (!cancelled && data) {
@@ -66,6 +66,10 @@ function Upload() {
             clearTimeout(timeoutId);
 
             if (!response.ok) {
+                if (response.status === 429) {
+                    alert("Too many requests. Please wait a minute and try again.");
+                    return;
+                }
                 let errorMsg = `Server error: ${response.status} ${response.statusText}`;
                 try {
                     const errorData = await response.json();

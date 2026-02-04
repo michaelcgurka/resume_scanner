@@ -8,6 +8,7 @@ __pycache__
 *.pyc
 node_modules
 SECURITY.md
+DEPLOY.md
 # Optional: uncomment if you use a local start script override
 # start.sh
 
