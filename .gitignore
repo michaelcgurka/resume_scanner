@@ -9,9 +9,3 @@ __pycache__
 node_modules
 SECURITY.md
 DEPLOY.md
-# Optional: uncomment if you use a local start script override
-# start.sh
-
-# Personal resume PDFs (do not commit)
-Michael Gurka CS Resume.pdf
-SWE_Resume.pdf
