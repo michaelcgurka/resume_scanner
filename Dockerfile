@@ -23,5 +23,6 @@ COPY backend/ ./backend/
 COPY --from=frontend-build /app/frontend/build ./frontend/build/
 EXPOSE 8000
 ENV PYTHONUNBUFFERED=1
-# Production: no --reload
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENV PORT=8000
+# Production: listen on PORT so Render (PORT=10000) works
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT}"]

@@ -288,7 +288,7 @@ async def score_resume_endpoint(request: Request, name: str, job_id: int = None)
         raise HTTPException(status_code=500, detail="Scoring failed. Please try again.")
 
 
-# Serve frontend build in production when frontend/build exists (single-deployment mode)
+
 _STATIC_ROOT = Path(__file__).resolve().parent.parent.parent / "frontend" / "build"
 if _STATIC_ROOT.is_dir():
     _static_dir = _STATIC_ROOT / "static"
@@ -297,8 +297,16 @@ if _STATIC_ROOT.is_dir():
     @app.get("/")
     def _serve_index():
         return FileResponse(_STATIC_ROOT / "index.html")
-    @app.get("/{full_path:path}")
-    def _serve_spa(full_path: str):
+
+    def _serve_spa_or_asset(full_path: str):
         if full_path.startswith("static/"):
             raise HTTPException(status_code=404, detail="Not found")
+        # Serve root-level build assets (favicon, manifest, etc.) so tab icon and PWA work
+        asset = _STATIC_ROOT / full_path
+        if asset.is_file():
+            return FileResponse(asset)
         return FileResponse(_STATIC_ROOT / "index.html")
+
+    @app.get("/{full_path:path}")
+    def _serve_spa(full_path: str):
+        return _serve_spa_or_asset(full_path)

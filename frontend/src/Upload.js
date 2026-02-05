@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Loader from "./Loader";
 
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
+// Same-origin when not set (Docker/single-service); explicit URL for dev or separate frontend
+function getApiBase() {
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+  if (typeof window !== "undefined" && window.location.port === "3000") return "http://localhost:8000";
+  return ""; // same origin (e.g. production backend serving frontend)
+}
+const API_BASE = getApiBase();
 
 function Upload() {
     const [file, setFile] = useState(null);

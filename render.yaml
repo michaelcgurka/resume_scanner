@@ -1,6 +1,3 @@
-# Render.com: connect this repo and add a Web Service (Docker).
-# Set env vars in Dashboard: API_KEY, CORS_ORIGINS (your app URL), DB_* from your Postgres.
-# For a free Postgres, create a PostgreSQL instance in Render and copy its env vars.
 services:
   - type: web
     name: resume-scanner
