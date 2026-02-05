@@ -302,9 +302,14 @@ if _STATIC_ROOT.is_dir():
         if full_path.startswith("static/"):
             raise HTTPException(status_code=404, detail="Not found")
         # Serve root-level build assets (favicon, manifest, etc.) so tab icon and PWA work
-        asset = _STATIC_ROOT / full_path
-        if asset.is_file():
-            return FileResponse(asset)
+        try:
+            asset_path = (_STATIC_ROOT / full_path).resolve()
+            asset_path.relative_to(_STATIC_ROOT)
+        except Exception:
+            # Either path traversal attempt or invalid path; do not serve arbitrary files
+            raise HTTPException(status_code=404, detail="Not found")
+        if asset_path.is_file():
+            return FileResponse(asset_path)
         return FileResponse(_STATIC_ROOT / "index.html")
 
     @app.get("/{full_path:path}")
