@@ -91,7 +91,7 @@ async def upload_file(
         update_score,
         update_job_score,
     )
-    from .scoring_logic import score_resume, resume_to_string
+    from .scoring_logic import score_resume
 
     t_start = time.perf_counter()
     contents = await file.read()
@@ -155,10 +155,10 @@ async def upload_file(
         print(f"DB get/create + insert job: {time.perf_counter() - t0:.1f}s", flush=True)
         t0 = time.perf_counter()
         loop = asyncio.get_event_loop()
-        score = await loop.run_in_executor(None, lambda: score_resume(description, resume_obj))
+        insights = await loop.run_in_executor(None, lambda: score_resume(description, resume_obj))
         print(f"Score (model load + encode): {time.perf_counter() - t0:.1f}s", flush=True)
-        update_job_score(job_obj.id, score)
-        update_score(resume_obj.id, score)
+        update_job_score(job_obj.id, insights["score"])
+        update_score(resume_obj.id, insights["score"])
 
         print(f"Upload total: {time.perf_counter() - t_start:.1f}s", flush=True)
         return {
@@ -168,7 +168,12 @@ async def upload_file(
             "status": "uploaded",
             "db_id": resume_obj.id,
             "job_id": job_obj.id,
-            "score": score,
+            "score": insights["score"],
+            "breakdown": insights["breakdown"],
+            "missing_keywords": insights["missing_keywords"],
+            "missing_keywords_by_category": insights["missing_keywords_by_category"],
+            "section_scores": insights["section_scores"],
+            "recommendations": insights["recommendations"],
         }
     except HTTPException:
         raise
@@ -206,17 +211,22 @@ async def add_job_description(request: Request, name: str, body: dict = Body(...
 
     job_obj = insert_job(resume.id, name, str(description))
     loop = asyncio.get_event_loop()
-    score = await loop.run_in_executor(
+    insights = await loop.run_in_executor(
         None, lambda: score_resume(str(description), resume)
     )
-    update_job_score(job_obj.id, score)
-    update_score(resume.id, score)
+    update_job_score(job_obj.id, insights["score"])
+    update_score(resume.id, insights["score"])
 
     return {
         "name": name,
         "job_id": job_obj.id,
         "resume_id": resume.id,
-        "score": score,
+        "score": insights["score"],
+        "breakdown": insights["breakdown"],
+        "missing_keywords": insights["missing_keywords"],
+        "missing_keywords_by_category": insights["missing_keywords_by_category"],
+        "section_scores": insights["section_scores"],
+        "recommendations": insights["recommendations"],
     }
 
 
@@ -277,10 +287,19 @@ async def score_resume_endpoint(request: Request, name: str, job_id: int = None)
             raise HTTPException(status_code=422, detail="Job description is empty.")
 
         loop = asyncio.get_event_loop()
-        score = await loop.run_in_executor(
+        insights = await loop.run_in_executor(
             None, lambda: score_resume(str(jd_text), resume)
         )
-        return {"name": name, "job_id": job.id, "score": score}
+        return {
+            "name": name,
+            "job_id": job.id,
+            "score": insights["score"],
+            "breakdown": insights["breakdown"],
+            "missing_keywords": insights["missing_keywords"],
+            "missing_keywords_by_category": insights["missing_keywords_by_category"],
+            "section_scores": insights["section_scores"],
+            "recommendations": insights["recommendations"],
+        }
     except HTTPException:
         raise
     except Exception as e:
@@ -301,7 +320,7 @@ if _STATIC_ROOT.is_dir():
     def _serve_spa_or_asset(full_path: str):
         if full_path.startswith("static/"):
             raise HTTPException(status_code=404, detail="Not found")
-        # Serve root-level build assets (favicon, manifest, etc.) so tab icon and PWA work
+
         asset = _STATIC_ROOT / full_path
         if asset.is_file():
             return FileResponse(asset)

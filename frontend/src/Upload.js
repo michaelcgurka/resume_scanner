@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Loader from "./Loader";
+import ScoreVisualizer from "./ScoreVisualizer";
+import InsightsPanel from "./InsightsPanel";
 
 // Same-origin when not set (Docker/single-service); explicit URL for dev or separate frontend
 function getApiBase() {
   if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
-  if (typeof window !== "undefined" && window.location.port === "3000") return "http://localhost:8000";
+  // Use same host as the page so 127.0.0.1 and localhost both work (e.g. WSL + Windows browser)
+  if (typeof window !== "undefined" && window.location.port === "3000") {
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  }
   return ""; // same origin (e.g. production backend serving frontend)
 }
 const API_BASE = getApiBase();
@@ -99,7 +104,7 @@ function Upload() {
             if (isTimeout) {
                 msg = "Request took too long (over 15 minutes). The first upload downloads and loads the scoring model—this can take 5–15 min on slow connections or disk. Next time, wait until the page shows \"Scorer ready\" before uploading, or check backend.log for timing details.";
             } else if (isNetwork) {
-                msg = "Could not reach the backend (Failed to fetch). Make sure the backend is running (npm start or ./start.sh) and that it is listening on the same host you use here. If you use 127.0.0.1 in the browser, try localhost instead, or set REACT_APP_API_URL in frontend/.env (e.g. REACT_APP_API_URL=http://127.0.0.1:8000).";
+                msg = `Could not reach the backend (Failed to fetch). From the project root run: ./start.sh (or npm start). Open ${API_BASE || "http://localhost:8000"}/health in your browser to check. If that works but upload still fails, set REACT_APP_API_URL in frontend/.env (e.g. REACT_APP_API_URL=http://127.0.0.1:8000) and restart the frontend.`;
             } else {
                 msg = `Error: Unable to upload file. ${error.message}`;
             }
@@ -111,16 +116,29 @@ function Upload() {
 
     if (viewingScore && lastResult) {
         return (
-            <div className="max-w-xl w-full mx-auto p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-center">
-                <p className="text-gray-900 dark:text-gray-100"><strong>Name:</strong> {lastResult.name}</p>
-                <p className="text-gray-900 dark:text-gray-100 mt-2"><strong>Score:</strong> {lastResult.score != null ? `${(Number(lastResult.score) * 100).toFixed(1)}%` : "—"}</p>
-                <button
-                    type="button"
-                    onClick={() => setViewingScore(false)}
-                    className="mt-4 text-sm text-gray-600 dark:text-gray-400 hover:underline"
-                >
-                    Back
-                </button>
+            <div className="max-w-xl w-full mx-auto p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <p className="text-gray-900 dark:text-gray-100 text-center"><strong>Name:</strong> {lastResult.name}</p>
+                <div className="mt-4 flex flex-col items-center">
+                    <ScoreVisualizer
+                        score={lastResult.score}
+                        breakdown={lastResult.breakdown}
+                    />
+                </div>
+                <InsightsPanel
+                    recommendations={lastResult.recommendations}
+                    missing_keywords={lastResult.missing_keywords}
+                    missing_keywords_by_category={lastResult.missing_keywords_by_category}
+                    section_scores={lastResult.section_scores}
+                />
+                <div className="text-center mt-4">
+                    <button
+                        type="button"
+                        onClick={() => setViewingScore(false)}
+                        className="text-sm text-gray-600 dark:text-gray-400 hover:underline"
+                    >
+                        Back
+                    </button>
+                </div>
             </div>
         );
     }
@@ -154,6 +172,11 @@ function Upload() {
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                 {warmupLoading ? "Preparing scorer (first time can take 1–5 min: downloading/loading model)…" : warmupDone ? "Scorer ready. Upload should be quick." : "First upload may take 1–5 min while the model loads."}
             </p>
+            {API_BASE && (
+                <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                    Backend: <a href={API_BASE + "/health"} target="_blank" rel="noopener noreferrer" className="underline">{API_BASE}</a>
+                </p>
+            )}
             {lastResult && (
                 <div className="mt-4">
                     <button

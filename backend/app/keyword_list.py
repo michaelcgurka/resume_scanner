@@ -89,3 +89,19 @@ other_keywords = ["blockchain", "smart contracts", "ethereum", "solidity", "hype
 combined_keywords = language_keywords + web_framework_keywords + cloud_keywords + big_data_keywords + ml_ai_concept_keywords + ml_framework_keywords + other_framework_keywords + other_keywords + other_tools_keywords + database_keywords + cybersecurity_keywords + sde_keywords + web_dev_concepts_keywords
 
 tech_keywords = set(combined_keywords)
+
+KEYWORD_CATEGORIES = [
+    ("Languages", language_keywords),
+    ("Web frameworks", web_framework_keywords),
+    ("Cloud & DevOps", cloud_keywords),
+    ("Databases", database_keywords),
+    ("ML/AI frameworks", ml_framework_keywords),
+    ("ML/AI concepts", ml_ai_concept_keywords),
+    ("Big data", big_data_keywords),
+    ("Other frameworks", other_framework_keywords),
+    ("Tools", other_tools_keywords),
+    ("SDE practices", sde_keywords),
+    ("Web dev concepts", web_dev_concepts_keywords),
+    ("Security", cybersecurity_keywords),
+    ("Other", other_keywords),
+]
