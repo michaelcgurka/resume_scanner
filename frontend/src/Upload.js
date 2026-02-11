@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Loader from "./Loader";
 import ScoreVisualizer from "./ScoreVisualizer";
 import InsightsPanel from "./InsightsPanel";
+import Toast from "./Toast";
 
 // Same-origin when not set (Docker/single-service); explicit URL for dev or separate frontend
 function getApiBase() {
@@ -22,6 +23,7 @@ function Upload() {
     const [description, setDescription] = useState("");
     const [warmupDone, setWarmupDone] = useState(false);
     const [warmupLoading, setWarmupLoading] = useState(true);
+    const [toastMessage, setToastMessage] = useState(null);
 
     // Preload the ML model when the page loads so the first upload is fast
     useEffect(() => {
@@ -95,7 +97,7 @@ function Upload() {
 
             const result = await response.json();
             setLastResult(result);
-            alert(`Successfully uploaded: ${result.filename}\nName: ${result.name}`);
+            setToastMessage(`Uploaded ${result.filename} — ${result.name}`);
         } catch (error) {
             console.error("Unable to upload file:", error);
             const isTimeout = error.name === "AbortError";
@@ -139,6 +141,11 @@ function Upload() {
                         Back
                     </button>
                 </div>
+                <Toast
+                    message={toastMessage}
+                    visible={!!toastMessage}
+                    onDismiss={() => setToastMessage(null)}
+                />
             </div>
         );
     }
@@ -193,6 +200,11 @@ function Upload() {
                     <Loader />
                 </div>
             )}
+            <Toast
+                message={toastMessage}
+                visible={!!toastMessage}
+                onDismiss={() => setToastMessage(null)}
+            />
         </div>
     );
 }

@@ -5,12 +5,12 @@ function Recommendations({ recommendations }) {
   return (
     <div className="mt-4">
       <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
-        <span className="text-amber-500" aria-hidden>●</span>
+        <span className="text-teal-500" aria-hidden>●</span>
         Recommendations
       </h3>
-      <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
+      <ul className="list-disc list-outside pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300">
         {recommendations.map((rec, i) => (
-          <li key={i}>{rec}</li>
+          <li key={i} className="pl-0.5">{rec}</li>
         ))}
       </ul>
     </div>
@@ -26,22 +26,20 @@ function MissingKeywords({ missing_keywords, missing_keywords_by_category }) {
   return (
     <div className="mt-4">
       <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
-        <span className="text-blue-500" aria-hidden>●</span>
+        <span className="text-indigo-500" aria-hidden>●</span>
         Missing keywords from job description
       </h3>
       {hasCategories ? (
-        <ul className="space-y-2 text-sm">
+        <ul className="list-disc list-outside pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300">
           {Object.entries(byCategory).map(([category, kws]) => (
-            <li key={category}>
+            <li key={category} className="pl-0.5">
               <span className="font-medium text-gray-600 dark:text-gray-400">{category}:</span>{" "}
-              <span className="text-gray-700 dark:text-gray-300">
-                {kws.map((k) => k).join(", ")}
-              </span>
+              <span>{kws.join(", ")}</span>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-gray-700 dark:text-gray-300">
+        <p className="text-sm text-gray-700 dark:text-gray-300 pl-5">
           {flat.join(", ")}
         </p>
       )}
@@ -58,12 +56,12 @@ function SectionScores({ section_scores }) {
   return (
     <div className="mt-4">
       <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
-        <span className="text-emerald-500" aria-hidden>●</span>
+        <span className="text-violet-500" aria-hidden>●</span>
         Section match (vs job description)
       </h3>
-      <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+      <ul className="list-disc list-outside pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300">
         {entries.map(({ name, value }) => (
-          <li key={name}>
+          <li key={name} className="pl-0.5">
             <span className="font-medium text-gray-600 dark:text-gray-400">{name}:</span> {value}%
           </li>
         ))}

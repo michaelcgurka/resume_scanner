@@ -15,7 +15,6 @@ DB_PORT = os.getenv("DB_PORT")
 if DB_NAME and DB_HOST and DB_USER:
     DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD or ''}@{DB_HOST}:{DB_PORT or '5432'}/{DB_NAME}"
 else:
-    # Local dev: no .env or no DB_* → SQLite in repo root so ./start.sh works without PostgreSQL
     _here = os.path.dirname(os.path.abspath(__file__))
     _root = os.path.dirname(os.path.dirname(_here))
     _sqlite_path = os.path.join(_root, "local.db")

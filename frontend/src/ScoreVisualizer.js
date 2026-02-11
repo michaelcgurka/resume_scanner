@@ -14,7 +14,7 @@ import {
 const GAUGE_COLORS = {
   low: "#ef4444",   // red < 40
   mid: "#eab308",   // yellow 40-70
-  high: "#22c55e",  // green > 70
+  high: "#14b8a6",
 };
 
 function getGaugeColor(valuePct) {
@@ -54,7 +54,7 @@ function ScoreGauge({ score }) {
   );
 }
 
-const BREAKDOWN_COLORS = ["#3b82f6", "#8b5cf6", "#06b6d4"];
+const BREAKDOWN_COLORS = ["#6366f1", "#8b5cf6", "#14b8a6"];
 
 function BreakdownBars({ breakdown }) {
   if (!breakdown) return null;
